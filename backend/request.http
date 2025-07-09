@@ -1,0 +1,95 @@
+### Variables
+@baseUrl = http://localhost:3000
+@token = <PASTE_JWT_TOKEN_HERE>
+@productId = <PASTE_PRODUCT_ID_HERE>
+
+### Register
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "password": "password123"
+}
+
+### Login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "password": "password123"
+}
+
+### Create Product
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=---011000010111000001101001
+
+-----011000010111000001101001
+Content-Disposition: form-data; name="name"
+
+Sample Product
+-----011000010111000001101001
+Content-Disposition: form-data; name="description"
+
+A sample product
+-----011000010111000001101001
+Content-Disposition: form-data; name="quantity"
+
+10
+-----011000010111000001101001
+Content-Disposition: form-data; name="price"
+
+99.99
+-----011000010111000001101001
+Content-Disposition: form-data; name="category"
+
+Electronics
+-----011000010111000001101001
+Content-Disposition: form-data; name="image"; filename="sample.jpg"
+Content-Type: image/jpeg
+
+<@./sample.jpg>
+-----011000010111000001101001--
+
+### Get All Products
+GET {{baseUrl}}/api/products
+Authorization: Bearer {{token}}
+
+### Get Product By ID
+GET {{baseUrl}}/api/products/{{productId}}
+Authorization: Bearer {{token}}
+
+### Update Product
+PUT {{baseUrl}}/api/products/{{productId}}
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=---011000010111000001101001
+
+-----011000010111000001101001
+Content-Disposition: form-data; name="name"
+
+Updated Product
+-----011000010111000001101001
+Content-Disposition: form-data; name="quantity"
+
+20
+-----011000010111000001101001
+Content-Disposition: form-data; name="price"
+
+149.99
+-----011000010111000001101001
+Content-Disposition: form-data; name="category"
+
+Updated Category
+-----011000010111000001101001
+Content-Disposition: form-data; name="image"; filename="updated.jpg"
+Content-Type: image/jpeg
+
+<@./updated.jpg>
+-----011000010111000001101001--
+
+### Delete Product
+DELETE {{baseUrl}}/api/products/{{productId}}
+Authorization: Bearer {{token}}
+
