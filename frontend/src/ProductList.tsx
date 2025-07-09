@@ -6,6 +6,8 @@ import { createProduct, updateProduct, deleteProduct } from './productsSlice';
 import type { Product } from './productsSlice';
 import { logout } from './authSlice';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 const initialForm: Omit<Product, '_id' | 'image'> = {
   name: '',
@@ -44,6 +46,7 @@ const ProductList: React.FC = () => {
   const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [page, setPage] = useState(1);
   const limit = 10;
+  const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
     dispatch(fetchProducts({
@@ -81,6 +84,14 @@ const ProductList: React.FC = () => {
       .then(() => {
         setForm(initialForm);
         setImageFile(undefined);
+        // Refresh product list after add
+        dispatch(fetchProducts({
+          ...filters,
+          name: debouncedName,
+          page,
+          limit,
+        }) as any);
+        setShowAddForm(false);
       });
   };
 
@@ -99,7 +110,16 @@ const ProductList: React.FC = () => {
   const handleUpdate = (_id: string) => {
     dispatch(updateProduct({ product: { _id, ...editForm, quantity: Number(editForm.quantity), price: Number(editForm.price), image: '' }, imageFile: editImageFile }))
       .unwrap()
-      .then(() => setEditId(null));
+      .then(() => {
+        setEditId(null);
+        // Refresh product list after update
+        dispatch(fetchProducts({
+          ...filters,
+          name: debouncedName,
+          page,
+          limit,
+        }) as any);
+      });
   };
 
   const handleDelete = (id: string) => {
@@ -134,6 +154,22 @@ const ProductList: React.FC = () => {
     navigate('/login');
   };
 
+  const handleExportExcel = () => {
+    const exportData = products.map(product => ({
+      Name: product.name,
+      Quantity: product.quantity,
+      Price: product.price,
+      Category: product.category,
+      'Stock Status': product.quantity > 0 ? 'In Stock' : 'Out of Stock',
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Products');
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(data, 'products.xlsx');
+  };
+
   if (loading) return <div className="text-center mt-5">Loading products...</div>;
   if (error) return <div className="text-danger text-center mt-5">{error}</div>;
 
@@ -143,6 +179,49 @@ const ProductList: React.FC = () => {
         <h2>Product Listing</h2>
         {authUser && (
           <button onClick={handleLogout} className="btn btn-outline-danger">Logout</button>
+        )}
+      </div>
+      {/* Add Product Form */}
+      {/* Move Add Product form above filter, and make it vertical */}
+      <div className="mb-4">
+        {!showAddForm ? (
+          <button className="btn btn-success mb-3" onClick={() => setShowAddForm(true)}>
+            Add Product
+          </button>
+        ) : (
+          <div>
+            <h4 className="mb-2">Add Product</h4>
+            <form onSubmit={handleAdd}>
+              <div className="mb-3">
+                <label htmlFor="add-name" className="form-label">Name</label>
+                <input id="add-name" name="name" className="form-control" placeholder="Name" value={form.name} onChange={handleChange} required />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="add-description" className="form-label">Description</label>
+                <input id="add-description" name="description" className="form-control" placeholder="Description" value={form.description} onChange={handleChange} />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="add-quantity" className="form-label">Quantity</label>
+                <input id="add-quantity" name="quantity" type="number" className="form-control" placeholder="Quantity" value={form.quantity} onChange={handleChange} required min={0} />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="add-price" className="form-label">Price</label>
+                <input id="add-price" name="price" type="number" className="form-control" placeholder="Price" value={form.price} onChange={handleChange} required min={0} step="0.01" />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="add-category" className="form-label">Category</label>
+                <input id="add-category" name="category" className="form-control" placeholder="Category" value={form.category} onChange={handleChange} required />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="add-image" className="form-label">Image</label>
+                <input id="add-image" name="image" type="file" className="form-control" accept="image/*" onChange={handleImageChange} />
+              </div>
+              <div className="d-flex gap-2">
+                <button type="submit" className="btn btn-success">Add Product</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowAddForm(false)}>Cancel</button>
+              </div>
+            </form>
+          </div>
         )}
       </div>
       {/* Filter UI */}
@@ -189,31 +268,11 @@ const ProductList: React.FC = () => {
           </button>
         </div>
       </div>
-      {/* Add Product Form */}
-      <form onSubmit={handleAdd} className="row g-2 mb-4 align-items-end">
-        <div className="col-md-2">
-          <input name="name" className="form-control" placeholder="Name" value={form.name} onChange={handleChange} required />
-        </div>
-        <div className="col-md-2">
-          <input name="description" className="form-control" placeholder="Description" value={form.description} onChange={handleChange} />
-        </div>
-        <div className="col-md-1">
-          <input name="quantity" type="number" className="form-control" placeholder="Quantity" value={form.quantity} onChange={handleChange} required min={0} />
-        </div>
-        <div className="col-md-1">
-          <input name="price" type="number" className="form-control" placeholder="Price" value={form.price} onChange={handleChange} required min={0} step="0.01" />
-        </div>
-        <div className="col-md-2">
-          <input name="category" className="form-control" placeholder="Category" value={form.category} onChange={handleChange} required />
-        </div>
-        <div className="col-md-2">
-          <input name="image" type="file" className="form-control" accept="image/*" onChange={handleImageChange} />
-        </div>
-        <div className="col-md-2">
-          <button type="submit" className="btn btn-success w-100">Add Product</button>
-        </div>
-      </form>
+      
       <div className="table-responsive">
+        <button className="btn btn-outline-primary mb-3" onClick={handleExportExcel} type="button">
+          Export to Excel
+        </button>
         <table className="table table-bordered align-middle">
           <thead className="table-light">
             <tr>
