@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axiosInstance from './axiosInstance';
 
 interface AuthState {
   user: null | { email: string };
@@ -20,7 +20,7 @@ export const login = createAsyncThunk(
   'auth/login',
   async (data: { email: string; password: string }, { rejectWithValue }) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', data);
+      const response = await axiosInstance.post('http://localhost:3000/api/auth/login', data);
       return response.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || 'Login failed');
@@ -32,7 +32,7 @@ export const register = createAsyncThunk(
   'auth/register',
   async (data: { email: string; password: string }, { rejectWithValue }) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/register', data);
+      const response = await axiosInstance.post('http://localhost:3000/api/auth/register', data);
       return response.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || 'Registration failed');

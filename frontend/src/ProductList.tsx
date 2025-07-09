@@ -4,6 +4,8 @@ import type { RootState, AppDispatch } from './store';
 import { fetchProducts } from './productsSlice';
 import { createProduct, updateProduct, deleteProduct } from './productsSlice';
 import type { Product } from './productsSlice';
+import { logout } from './authSlice';
+import { useNavigate } from 'react-router-dom';
 
 const initialForm: Omit<Product, '_id' | 'image'> = {
   name: '',
@@ -23,6 +25,8 @@ const getImageUrl = (imagePath: string) => {
 
 const ProductList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const authUser = useSelector((state: RootState) => state.auth.user);
   const { products, loading, error, total, page: currentPage, totalPages } = useSelector((state: RootState) => state.products);
 
   // Add product form state
@@ -125,12 +129,24 @@ const ProductList: React.FC = () => {
     setPage(1);
   };
 
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/login');
+  };
+
   if (loading) return <div>Loading products...</div>;
   if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
   return (
     <div>
-      <h2>Product Listing</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>Product Listing</h2>
+        {authUser && (
+          <button onClick={handleLogout} style={{ padding: '8px 16px', cursor: 'pointer' }}>
+            Logout
+          </button>
+        )}
+      </div>
       {/* Filter UI */}
       <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
         <input

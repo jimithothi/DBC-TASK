@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { ProductService } from '../services/product.service';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Creates a new product.
@@ -63,15 +65,31 @@ export const updateProduct = async (req: Request, res: Response) => {
   try {
     const { name, description, quantity, price, category } = req.body;
     let imagePath;
+    let oldImagePath;
     if (req.file) {
       imagePath = req.file.path;
+      // Fetch the existing product to get the old image path
+      const existingProduct = await ProductService.getProductById(req.params.id);
+      if (existingProduct && existingProduct.image) {
+        oldImagePath = existingProduct.image;
+      }
     }
     const product = await ProductService.updateProduct(
       req.params.id,
       { name, description, quantity, price, category, ...(imagePath && { image: imagePath }) }
     );
     if (!product) {
+      // If product not found, optionally delete the newly uploaded image to avoid orphan files
+      if (imagePath) {
+        fs.unlink(imagePath, () => {});
+      }
       return res.status(404).json({ message: 'Product not found.' });
+    }
+    // Delete the old image file if a new one was uploaded and the old image exists
+    if (oldImagePath && imagePath && oldImagePath !== imagePath) {
+      fs.unlink(oldImagePath, (err) => {
+        // Ignore errors (file may not exist)
+      });
     }
     res.status(200).json(product);
   } catch (error) {

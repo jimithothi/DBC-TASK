@@ -1,69 +1,61 @@
-# React + TypeScript + Vite
+# React + Redux + TypeScript Product App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a product management frontend built with React, Redux Toolkit, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## Features
+- User authentication (login/register/logout)
+- Protected routes
+- Product CRUD operations
+- Axios with global error handling and auth token support
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Prerequisites
+- Node.js (v16 or higher recommended)
+- npm (v8 or higher)
 
-## Expanding the ESLint configuration
+## Setup Instructions
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd <project-directory>
+   ```
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+3. **Configure environment variables**
+   - Create a `.env` file in the project root:
+     ```env
+     VITE_API_BASE_URL=http://localhost:3000
+     ```
+   - Change the value if your backend runs on a different URL/port.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+   The app will be available at [http://localhost:5173](http://localhost:5173).
+
+5. **Build for production**
+   ```bash
+   npm run build
+   ```
+
+6. **Preview production build**
+   ```bash
+   npm run preview
+   ```
+
+## Linting
+```bash
+npm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Notes
+- Make sure your backend API is running and accessible at the URL specified in `VITE_API_BASE_URL`.
+- On 401 Unauthorized errors, the app will automatically log out and redirect to the login page.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+Feel free to customize this README for your project needs!

@@ -1,6 +1,6 @@
 import './App.css'
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Login';
 import Register from './Register';
 import ProtectedRoute from './ProtectedRoute';
@@ -23,7 +23,7 @@ function App() {
         path="/"
         element={
           <ProtectedRoute>
-            <div>Welcome! You are logged in.</div>
+            <Navigate to="/products" replace />
           </ProtectedRoute>
         }
       />

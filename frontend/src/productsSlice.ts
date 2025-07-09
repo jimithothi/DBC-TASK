@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axiosInstance from './axiosInstance';
 
 export interface Product {
   _id: string;
@@ -40,7 +40,7 @@ export const fetchProducts = createAsyncThunk(
       if (params.name) query.append('name', params.name);
       if (params.category) query.append('category', params.category);
       if (params.stockStatus) query.append('stockStatus', params.stockStatus);
-      const response = await axios.get(`http://localhost:3000/api/products?${query.toString()}`, {
+      const response = await axiosInstance.get(`http://localhost:3000/api/products?${query.toString()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -65,7 +65,7 @@ export const createProduct = createAsyncThunk(
       if (data.imageFile) {
         formData.append('image', data.imageFile);
       }
-      const response = await axios.post('http://localhost:3000/api/products', formData, {
+      const response = await axiosInstance.post('http://localhost:3000/api/products', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -90,7 +90,7 @@ export const updateProduct = createAsyncThunk(
       if (data.imageFile) {
         formData.append('image', data.imageFile);
       }
-      const response = await axios.put(`http://localhost:3000/api/products/${data.product._id}`, formData, {
+      const response = await axiosInstance.put(`http://localhost:3000/api/products/${data.product._id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -108,7 +108,7 @@ export const deleteProduct = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:3000/api/products/${id}`, {
+      await axiosInstance.delete(`http://localhost:3000/api/products/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
