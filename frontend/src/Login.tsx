@@ -46,32 +46,38 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 300, margin: 'auto', padding: 20 }}>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          style={{ width: '100%', marginBottom: 10 }}
-        />
-        {(localErrors.email || formErrors.email) && <div style={{ color: 'red', fontSize: 12 }}>{localErrors.email || formErrors.email}</div>}
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          style={{ width: '100%', marginBottom: 10 }}
-        />
-        {(localErrors.password || formErrors.password) && <div style={{ color: 'red', fontSize: 12 }}>{localErrors.password || formErrors.password}</div>}
-        <button type="submit" style={{ width: '100%' }} disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-      {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
-      <div style={{ marginTop: 10 }}>
-        Don't have an account? <a href="/register">Register</a>
+    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+      <div className="card p-4 shadow" style={{ maxWidth: 400, width: '100%' }}>
+        <h2 className="mb-4 text-center">Login</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <input
+              type="email"
+              className="form-control"
+              placeholder="Email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+            {(localErrors.email || formErrors.email) && <div className="text-danger small mt-1">{localErrors.email || formErrors.email}</div>}
+          </div>
+          <div className="mb-3">
+            <input
+              type="password"
+              className="form-control"
+              placeholder="Password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+            {(localErrors.password || formErrors.password) && <div className="text-danger small mt-1">{localErrors.password || formErrors.password}</div>}
+          </div>
+          <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+        {error && <div className="text-danger mt-3 text-center">{error}</div>}
+        <div className="mt-3 text-center">
+          Don't have an account? <a href="/register">Register</a>
+        </div>
       </div>
     </div>
   );

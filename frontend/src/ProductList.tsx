@@ -43,7 +43,7 @@ const ProductList: React.FC = () => {
   const [debouncedName, setDebouncedName] = useState('');
   const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [page, setPage] = useState(1);
-  const limit = 5;
+  const limit = 10;
 
   useEffect(() => {
     dispatch(fetchProducts({
@@ -134,131 +134,145 @@ const ProductList: React.FC = () => {
     navigate('/login');
   };
 
-  if (loading) return <div>Loading products...</div>;
-  if (error) return <div style={{ color: 'red' }}>{error}</div>;
+  if (loading) return <div className="text-center mt-5">Loading products...</div>;
+  if (error) return <div className="text-danger text-center mt-5">{error}</div>;
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="container py-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Product Listing</h2>
         {authUser && (
-          <button onClick={handleLogout} style={{ padding: '8px 16px', cursor: 'pointer' }}>
-            Logout
-          </button>
+          <button onClick={handleLogout} className="btn btn-outline-danger">Logout</button>
         )}
       </div>
       {/* Filter UI */}
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
-        <input
-          name="name"
-          placeholder="Filter by name"
-          value={filters.name}
-          onChange={handleNameChange}
-        />
-        <input
-          name="category"
-          placeholder="Filter by category"
-          value={filters.category}
-          onChange={handleCategoryChange}
-        />
-        <select
-          name="stockStatus"
-          value={filters.stockStatus}
-          onChange={handleStockStatusChange}
-        >
-          <option value="">All</option>
-          <option value="in_stock">In Stock</option>
-          <option value="out_of_stock">Out of Stock</option>
-        </select>
-        <button
-          onClick={() => {
-            setPage(1);
-            dispatch(fetchProducts({ ...filters, name: debouncedName, page: 1, limit } as any));
-          }}
-        >
-          Apply Filters
-        </button>
+      <div className="row g-2 mb-3">
+        <div className="col-md-3">
+          <input
+            name="name"
+            className="form-control"
+            placeholder="Filter by name"
+            value={filters.name}
+            onChange={handleNameChange}
+          />
+        </div>
+        <div className="col-md-3">
+          <input
+            name="category"
+            className="form-control"
+            placeholder="Filter by category"
+            value={filters.category}
+            onChange={handleCategoryChange}
+          />
+        </div>
+        <div className="col-md-3">
+          <select
+            name="stockStatus"
+            className="form-select"
+            value={filters.stockStatus}
+            onChange={handleStockStatusChange}
+          >
+            <option value="">All</option>
+            <option value="in_stock">In Stock</option>
+            <option value="out_of_stock">Out of Stock</option>
+          </select>
+        </div>
+        <div className="col-md-3">
+          <button
+            className="btn btn-primary w-100"
+            onClick={() => {
+              setPage(1);
+              dispatch(fetchProducts({ ...filters, name: debouncedName, page: 1, limit } as any));
+            }}
+          >
+            Apply Filters
+          </button>
+        </div>
       </div>
       {/* Add Product Form */}
-      <form onSubmit={handleAdd} style={{ marginBottom: 24, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
-        <input name="description" placeholder="Description" value={form.description} onChange={handleChange} />
-        <input name="quantity" type="number" placeholder="Quantity" value={form.quantity} onChange={handleChange} required min={0} />
-        <input name="price" type="number" placeholder="Price" value={form.price} onChange={handleChange} required min={0} step="0.01" />
-        <input name="category" placeholder="Category" value={form.category} onChange={handleChange} required />
-        <input name="image" type="file" accept="image/*" onChange={handleImageChange} />
-        <button type="submit">Add Product</button>
+      <form onSubmit={handleAdd} className="row g-2 mb-4 align-items-end">
+        <div className="col-md-2">
+          <input name="name" className="form-control" placeholder="Name" value={form.name} onChange={handleChange} required />
+        </div>
+        <div className="col-md-2">
+          <input name="description" className="form-control" placeholder="Description" value={form.description} onChange={handleChange} />
+        </div>
+        <div className="col-md-1">
+          <input name="quantity" type="number" className="form-control" placeholder="Quantity" value={form.quantity} onChange={handleChange} required min={0} />
+        </div>
+        <div className="col-md-1">
+          <input name="price" type="number" className="form-control" placeholder="Price" value={form.price} onChange={handleChange} required min={0} step="0.01" />
+        </div>
+        <div className="col-md-2">
+          <input name="category" className="form-control" placeholder="Category" value={form.category} onChange={handleChange} required />
+        </div>
+        <div className="col-md-2">
+          <input name="image" type="file" className="form-control" accept="image/*" onChange={handleImageChange} />
+        </div>
+        <div className="col-md-2">
+          <button type="submit" className="btn btn-success w-100">Add Product</button>
+        </div>
       </form>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th style={{ border: '1px solid #ccc', padding: 8 }}>Image</th>
-            <th style={{ border: '1px solid #ccc', padding: 8 }}>Name</th>
-            <th style={{ border: '1px solid #ccc', padding: 8 }}>Description</th>
-            <th style={{ border: '1px solid #ccc', padding: 8 }}>Quantity</th>
-            <th style={{ border: '1px solid #ccc', padding: 8 }}>Price</th>
-            <th style={{ border: '1px solid #ccc', padding: 8 }}>Category</th>
-            <th style={{ border: '1px solid #ccc', padding: 8 }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((product) => (
-            <tr key={product._id}>
-              <td style={{ border: '1px solid #ccc', padding: 8 }}>
-                {product.image ? (
-                  <img src={getImageUrl(product.image)} alt={product.name} style={{ width: 60, height: 60, objectFit: 'cover' }} />
-                ) : (
-                  'No Image'
-                )}
-              </td>
-              {editId === product._id ? (
-                <>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>
-                    <input name="name" value={editForm.name} onChange={handleEditChange} required />
-                  </td>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>
-                    <input name="description" value={editForm.description} onChange={handleEditChange} />
-                  </td>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>
-                    <input name="quantity" type="number" value={editForm.quantity} onChange={handleEditChange} required min={0} />
-                  </td>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>
-                    <input name="price" type="number" value={editForm.price} onChange={handleEditChange} required min={0} step="0.01" />
-                  </td>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>
-                    <input name="category" value={editForm.category} onChange={handleEditChange} required />
-                  </td>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>
-                    <input name="image" type="file" accept="image/*" onChange={handleEditImageChange} />
-                  </td>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>
-                    <button onClick={() => handleUpdate(product._id)} style={{ marginRight: 4 }}>Save</button>
-                    <button onClick={() => setEditId(null)} type="button">Cancel</button>
-                  </td>
-                </>
-              ) : (
-                <>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>{product.name}</td>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>{product.description || '-'}</td>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>{product.quantity}</td>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>{product.price}</td>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>{product.category}</td>
-                  <td style={{ border: '1px solid #ccc', padding: 8 }}>
-                    <button onClick={() => handleEdit(product)} style={{ marginRight: 4 }}>Edit</button>
-                    <button onClick={() => handleDelete(product._id)} style={{ color: 'red' }}>Delete</button>
-                  </td>
-                </>
-              )}
+      <div className="table-responsive">
+        <table className="table table-bordered align-middle">
+          <thead className="table-light">
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Category</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product._id}>
+                <td>
+                  {product.image ? (
+                    <img src={getImageUrl(product.image)} alt={product.name} style={{ width: 60, height: 60, objectFit: 'cover' }} className="rounded" />
+                  ) : (
+                    <span className="text-muted">No Image</span>
+                  )}
+                </td>
+                {editId === product._id ? (
+                  <>
+                    <td><input name="name" className="form-control" value={editForm.name} onChange={handleEditChange} required /></td>
+                    <td><input name="description" className="form-control" value={editForm.description} onChange={handleEditChange} /></td>
+                    <td><input name="quantity" type="number" className="form-control" value={editForm.quantity} onChange={handleEditChange} required min={0} /></td>
+                    <td><input name="price" type="number" className="form-control" value={editForm.price} onChange={handleEditChange} required min={0} step="0.01" /></td>
+                    <td><input name="category" className="form-control" value={editForm.category} onChange={handleEditChange} required /></td>
+                    <td><input name="image" type="file" className="form-control" accept="image/*" onChange={handleEditImageChange} /></td>
+                    <td>
+                      <button onClick={() => handleUpdate(product._id)} className="btn btn-primary btn-sm me-2">Save</button>
+                      <button onClick={() => setEditId(null)} type="button" className="btn btn-secondary btn-sm">Cancel</button>
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td>{product.name}</td>
+                    <td>{product.description || '-'}</td>
+                    <td>{product.quantity}</td>
+                    <td>{product.price}</td>
+                    <td>{product.category}</td>
+                    <td>
+                      <button onClick={() => handleEdit(product)} className="btn btn-warning btn-sm me-2">Edit</button>
+                      <button onClick={() => handleDelete(product._id)} className="btn btn-danger btn-sm">Delete</button>
+                    </td>
+                  </>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {/* Pagination Controls */}
-      <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>Previous</button>
+      <div className="d-flex align-items-center gap-2 mt-4">
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} className="btn btn-outline-primary btn-sm" disabled={page === 1}>Previous</button>
         <span>Page {currentPage} of {totalPages || 1}</span>
-        <button onClick={() => setPage(p => (totalPages ? Math.min(totalPages, p + 1) : p + 1))} disabled={page === totalPages}>Next</button>
-        <span>Total Products: {total}</span>
+        <button onClick={() => setPage(p => (totalPages ? Math.min(totalPages, p + 1) : p + 1))} className="btn btn-outline-primary btn-sm" disabled={page === totalPages}>Next</button>
+        <span className="ms-3">Total Products: {total}</span>
       </div>
     </div>
   );

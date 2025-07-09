@@ -31,46 +31,50 @@ const Register: React.FC = () => {
   const initialValues: FormValues = { email: '', password: '' };
 
   return (
-    <div style={{ maxWidth: 300, margin: 'auto', padding: 20 }}>
-      <h2>Register</h2>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={(
-          { email, password }: FormValues
-        ) => {
-          dispatch(register({ email, password }));
-        }}
-      >
-        {({ isSubmitting }: { isSubmitting: boolean }) => (
-          <Form>
-            <Field
-              type="email"
-              name="email"
-              placeholder="Email"
-              style={{ width: '100%', marginBottom: 10 }}
-            />
-            <ErrorMessage name="email">
-              {msg => <div style={{ color: 'red', fontSize: 12 }}>{msg}</div>}
-            </ErrorMessage>
-            <Field
-              type="password"
-              name="password"
-              placeholder="Password"
-              style={{ width: '100%', marginBottom: 10 }}
-            />
-            <ErrorMessage name="password">
-              {msg => <div style={{ color: 'red', fontSize: 12 }}>{msg}</div>}
-            </ErrorMessage>
-            <button type="submit" style={{ width: '100%' }} disabled={loading || isSubmitting}>
-              {loading ? 'Registering...' : 'Register'}
-            </button>
-          </Form>
-        )}
-      </Formik>
-      {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
-      <div style={{ marginTop: 10 }}>
-        Already have an account? <a href="/login">Login</a>
+    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+      <div className="card p-4 shadow" style={{ maxWidth: 400, width: '100%' }}>
+        <h2 className="mb-4 text-center">Register</h2>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={({ email, password }: FormValues) => {
+            dispatch(register({ email, password }));
+          }}
+        >
+          {({ isSubmitting }: { isSubmitting: boolean }) => (
+            <Form>
+              <div className="mb-3">
+                <Field
+                  type="email"
+                  name="email"
+                  className="form-control"
+                  placeholder="Email"
+                />
+                <ErrorMessage name="email">
+                  {msg => <div className="text-danger small mt-1">{msg}</div>}
+                </ErrorMessage>
+              </div>
+              <div className="mb-3">
+                <Field
+                  type="password"
+                  name="password"
+                  className="form-control"
+                  placeholder="Password"
+                />
+                <ErrorMessage name="password">
+                  {msg => <div className="text-danger small mt-1">{msg}</div>}
+                </ErrorMessage>
+              </div>
+              <button type="submit" className="btn btn-primary w-100" disabled={loading || isSubmitting}>
+                {loading ? 'Registering...' : 'Register'}
+              </button>
+            </Form>
+          )}
+        </Formik>
+        {error && <div className="text-danger mt-3 text-center">{error}</div>}
+        <div className="mt-3 text-center">
+          Already have an account? <a href="/login">Login</a>
+        </div>
       </div>
     </div>
   );
